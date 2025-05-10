@@ -1,0 +1,33 @@
+﻿@model PharmacyInventorySystem.Models.Supplier
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Supplier Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="section-header sales-reports-header">
+        <i class="bi bi-truck me-2"></i>
+        <span>Supplier Details</span>
+    </div>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Supplier Name</dt>
+                <dd class="col-sm-9">@Model.SupplierName</dd>
+
+                <dt class="col-sm-3">Contact Email</dt>
+                <dd class="col-sm-9">@Model.ContactEmail</dd>
+
+                <dt class="col-sm-3">Phone Number</dt>
+                <dd class="col-sm-9">@Model.PhoneNumber</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <a asp-action="Index" class="btn btn-secondary rounded-pill px-4">Back to List</a>
+        <a asp-action="Edit" asp-route-id="@Model.SupplierID" class="btn btn-warning rounded-pill px-4">Edit</a>
+    </div>
+</div>

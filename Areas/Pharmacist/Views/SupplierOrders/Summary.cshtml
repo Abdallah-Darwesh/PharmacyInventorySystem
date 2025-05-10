@@ -1,0 +1,64 @@
+﻿@model PharmacyInventorySystem.Models.SupplierOrder
+
+@{
+    ViewData["Title"] = "Order Summary";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded-4 mb-5">
+        <div class="card-header bg-gradient-primary text-white d-flex align-items-center gap-2">
+            <i class="bi bi-clipboard-data"></i>
+            <h2 class="mb-0">Order Summary - Order #@Model.SupplierOrderID</h2>
+        </div>
+        <div class="card-body bg-white">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <strong>Supplier:</strong> @Model.Supplier?.SupplierName
+                </div>
+                <div class="col-md-4">
+                    <strong>Date:</strong> @Model.SignOrderDate.ToShortDateString()
+                </div>
+                <div class="col-md-4">
+                    <strong>Total Amount:</strong> <span class="text-success">@Model.TotalAmount.ToString("0.00") EGP</span>
+                </div>
+            </div>
+            <hr />
+            <h4 class="mb-3">Products in this Order</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle rounded-4 overflow-hidden">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Expiry</th>
+                            <th>Quantity</th>
+                            <th>Selling Price</th>
+                            <th>Buying Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in Model.SupplierOrderDetails)
+                        {
+                            <tr>
+                                <td>@detail.Product.ProductName</td>
+                                <td>@detail.Product.Category?.CategoryName</td>
+                                <td>@detail.Product.ExDate.ToShortDateString()</td>
+                                <td>@detail.Quantity</td>
+                                <td>@detail.SUnitPrice.ToString("0.00") EGP</td>
+                                <td>@detail.BUnitPrice.ToString("0.00") EGP</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/Pharmacist/SupplierOrders/PrintPdf/@Model.SupplierOrderID" class="btn btn-primary btn-lg px-4 py-2 rounded-pill no-spa" target="_blank">
+                    <i class="bi bi-download me-1"></i> Download PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+

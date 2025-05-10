@@ -1,0 +1,178 @@
+﻿@model PharmacyInventorySystem.ViewModels.DashboardViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Manager Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid fade-in">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center welcome-header">
+                        <div class="icon-shape bg-gradient-primary text-white">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-1">Welcome, @ViewBag.FullName!</h2>
+                            <p class="text-muted mb-0">Manage your pharmacy operations and monitor performance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="section-header sales-reports-header mt-4 mb-4">
+                <i class="bi bi-truck me-2"></i>
+                <span>Manage Suppliers</span>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="icon-shape bg-gradient-primary text-white mx-auto mb-3">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <h5 class="card-title">Manage Suppliers</h5>
+                    <p class="card-text text-muted">Add, edit, or remove suppliers</p>
+                    <a asp-area="Manager" asp-controller="Supplier" asp-action="Index" class="btn btn-primary w-100">
+                        <i class="bi bi-gear me-2"></i>Manage
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="section-header sales-reports-header mt-4 mb-4">
+                <i class="bi bi-tags me-2"></i>
+                <span>Manage Categories</span>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="icon-shape bg-gradient-primary text-white mx-auto mb-3">
+                        <i class="bi bi-tags"></i>
+                    </div>
+                    <h5 class="card-title">Manage Categories</h5>
+                    <p class="card-text text-muted">Organize product categories</p>
+                    <a asp-area="Manager" asp-controller="Category" asp-action="Index" class="btn btn-primary w-100">
+                        <i class="bi bi-gear me-2"></i>Manage
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="icon-shape bg-gradient-primary text-white mx-auto mb-3">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                    <h5 class="card-title">Manage Orders</h5>
+                    <p class="card-text text-muted">Review and process orders</p>
+                    <a asp-area="Manager" asp-controller="ManagerSupplierOrder" asp-action="Index" class="btn btn-primary w-100">
+                        <i class="bi bi-gear me-2"></i>Manage
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="icon-shape bg-gradient-primary text-white mx-auto mb-3">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </div>
+                    <h5 class="card-title">Manage Returns</h5>
+                    <p class="card-text text-muted">Process and track returns</p>
+                    <a asp-area="Manager" asp-controller="ReturnsReport" asp-action="Index" class="btn btn-primary w-100">
+                        <i class="bi bi-gear me-2"></i>Manage
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="section-header sales-reports-header mt-4 mb-4">
+                <i class="bi bi-graph-up me-2"></i>
+                <span>Sales Reports</span>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-cash-stack me-2"></i>
+                                        Sales Overview
+                                    </h5>
+                                    <p class="text-muted">View detailed sales reports and analytics</p>
+                                    <a asp-area="Manager" asp-controller="SalesReport" asp-action="Index" class="btn btn-primary">
+                                        <i class="bi bi-eye me-2"></i>View Reports
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        Stock Alerts
+                                    </h5>
+                                    <p class="text-muted">Monitor inventory levels and alerts</p>
+                                    <a asp-area="Manager" asp-controller="Home" asp-action="Report" class="btn btn-primary">
+                                        <i class="bi bi-eye me-2"></i>View Alerts
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .icon-shape {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .icon-shape i {
+            font-size: 1.5rem;
+        }
+
+        .card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+}

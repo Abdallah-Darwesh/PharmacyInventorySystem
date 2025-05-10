@@ -1,0 +1,109 @@
+@{
+    ViewData["Title"] = "Account Settings";
+    Layout = "_Layout.cshtml";
+}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow rounded account-settings-card">
+                <div class="card-header bg-gradient-primary text-white d-flex align-items-center">
+                    <i class="bi bi-gear-fill me-2"></i>
+                    <h3 class="mb-0">Account Settings</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 border-end">
+                            <div class="list-group list-group-flush" id="accountSettingsTabs">
+                                <button type="button" class="list-group-item list-group-item-action active" data-tab="profile">
+                                    <i class="bi bi-person me-2"></i> Profile
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" data-tab="change-password">
+                                    <i class="bi bi-lock me-2"></i> Change Password
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" data-tab="email-settings">
+                                    <i class="bi bi-envelope me-2"></i> Email Settings
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" data-tab="two-factor">
+                                    <i class="bi bi-shield-lock me-2"></i> Two-Factor Authentication
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" data-tab="personal-data">
+                                    <i class="bi bi-file-earmark-person me-2"></i> Personal Data
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div id="accountSettingsContent">
+                                <div data-content="profile">
+                                    <h5 class="mb-3"><i class="bi bi-person me-2"></i>Profile</h5>
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">Username</label>
+                                            <input type="text" class="form-control" value="@User.Identity?.Name" readonly />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Phone number</label>
+                                            <input type="text" class="form-control" placeholder="Phone number" />
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">Save</button>
+                                    </form>
+                                </div>
+                                <div data-content="change-password" style="display:none;">
+                                    <h5 class="mb-3"><i class="bi bi-lock me-2"></i>Change Password</h5>
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">Current Password</label>
+                                            <input type="password" class="form-control" placeholder="Current password" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">New Password</label>
+                                            <input type="password" class="form-control" placeholder="New password" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Confirm New Password</label>
+                                            <input type="password" class="form-control" placeholder="Confirm new password" />
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">Change Password</button>
+                                    </form>
+                                </div>
+                                <div data-content="email-settings" style="display:none;">
+                                    <h5 class="mb-3"><i class="bi bi-envelope me-2"></i>Email Settings</h5>
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" value="@User.Identity?.Name" readonly />
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">Update Email</button>
+                                    </form>
+                                </div>
+                                <div data-content="two-factor" style="display:none;">
+                                    <h5 class="mb-3"><i class="bi bi-shield-lock me-2"></i>Two-Factor Authentication</h5>
+                                    <div class="alert alert-info">Two-factor authentication management coming soon.</div>
+                                </div>
+                                <div data-content="personal-data" style="display:none;">
+                                    <h5 class="mb-3"><i class="bi bi-file-earmark-person me-2"></i>Personal Data</h5>
+                                    <div class="alert alert-info">Personal data management coming soon.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('#accountSettingsTabs .list-group-item-action').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('#accountSettingsTabs .list-group-item-action').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    var tab = this.getAttribute('data-tab');
+                    document.querySelectorAll('#accountSettingsContent > div').forEach(function(content) {
+                        content.style.display = content.getAttribute('data-content') === tab ? '' : 'none';
+                    });
+                });
+            });
+        });
+    </script>
+} 

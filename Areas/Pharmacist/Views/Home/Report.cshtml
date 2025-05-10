@@ -1,0 +1,70 @@
+﻿@model IEnumerable<PharmacyInventorySystem.Models.Product>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Low Stock and Near Expiry Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    int lowStockThreshold = 10;
+    int expiryThresholdDays = 30;
+    DateTime today = DateTime.Today;
+    DateTime nearExpiry = today.AddDays(expiryThresholdDays);
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Inventory Alert Report</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-success text-center fs-5">
+            ✅ All products are in good condition. Stock levels and expiry dates are within safe limits.
+        </div>
+    }
+    else
+    {
+        <div id="reportAlert" class="alert alert-warning fs-6">
+            ⚠️ The following products are either low in stock (less than @lowStockThreshold units) or nearing expiry (within @expiryThresholdDays days).
+            <br />
+            <a asp-area="Pharmacist" asp-controller="SupplierContact" asp-action="Index" class="btn btn-sm btn-outline-dark mt-2">
+                📞 Contact Supplier Now
+            </a>
+            <br />
+
+        </div>
+
+
+
+
+        <table class="table table-bordered table-hover mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model)
+                {
+                    bool isLowStock = product.Quantity < lowStockThreshold;
+                    bool isNearExpiry = product.ExDate <= nearExpiry;
+
+                    var statusList = new List<string>();
+                    if (isLowStock) statusList.Add("Low Stock");
+                    if (isNearExpiry) statusList.Add("Near Expiry");
+
+                    string rowClass = (isLowStock || isNearExpiry) ? "table-danger" : "";
+                    string status = string.Join(" | ", statusList);
+
+                    <tr class="@rowClass">
+                        <td>@product.ProductName</td>
+                        <td>@product.Quantity</td>
+                        <td>@product.ExDate.ToString("yyyy-MM-dd")</td>
+                        <td>@status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

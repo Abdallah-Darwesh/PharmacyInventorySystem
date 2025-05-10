@@ -1,0 +1,179 @@
+﻿@model List<PharmacyInventorySystem.ViewModels.ManagerSupplierOrderViewModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Supplier Orders Overview";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var supplierStats = Model
+        .GroupBy(m => m.SupplierName)
+        .Select(g => new { SupplierName = g.Key, Count = g.Count() })
+        .OrderByDescending(g => g.Count)
+        .ToList();
+
+    var chartLabels = string.Join(",", supplierStats.Select(s => $"'{s.SupplierName}'"));
+    var chartData = string.Join(",", supplierStats.Select(s => s.Count));
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap5.min.css" />
+}
+
+<div class="section-header sales-reports-header">
+    <i class="bi bi-truck me-2"></i>
+    <span>Supplier Orders Overview</span>
+</div>
+<div class="container">
+    <div class="card shadow rounded w-100 mb-5">
+        <div class="card-header bg-gradient-primary text-white d-flex align-items-center gap-2">
+            <i class="bi bi-bar-chart-fill"></i>
+            <span>Supplier Orders Chart</span>
+        </div>
+        <div class="card-body">
+            <canvas id="supplierChart" height="100" style="min-height:180px;width:100%;display:block;"
+                data-labels='@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(supplierStats.Select(s => s.SupplierName)))'
+                data-data='@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(supplierStats.Select(s => s.Count)))'></canvas>
+            @if (!Model.Any())
+            {
+                <div class="text-center text-muted mt-3">
+                    <i class="bi bi-bar-chart" style="font-size:2rem;"></i><br />
+                    No data to display in chart.
+                </div>
+            }
+        </div>
+    </div>
+    @if (Model.Count == 0)
+    {
+        <div class="card shadow rounded w-100">
+            <div class="card-body">
+                <div class="alert alert-info mb-0">No supplier orders have been created yet.</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow rounded w-100">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ordersTable" class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Supplier</th>
+                                <th>Order Date</th>
+                                <th>Total Amount</th>
+                                <th>Pharmacist</th>
+                                <th>Products Count</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Count; i++)
+                            {
+                                var order = Model[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>@order.SupplierName</td>
+                                    <td>@order.SignOrderDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@order.TotalAmount.ToString("C")</td>
+                                    <td>@order.PharmacistName</td>
+                                    <td>@order.ProductsCount</td>
+                                    <td>
+                                        <a asp-area="Manager"
+                                           asp-controller="ManagerSupplierOrder"
+                                           asp-action="Details"
+                                           asp-route-id="@order.SupplierOrderID"
+                                           class="btn btn-sm btn-primary">
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <!-- Core Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- DataTables Core -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- DataTables Export Buttons -->
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script>
+        // DataTable with Export Buttons
+        $(document).ready(function () {
+            $('#ordersTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'copyHtml5',
+                    'excelHtml5',
+                    'csvHtml5',
+                    'pdfHtml5',
+                    'print'
+                ]
+            });
+        });
+
+        // Chart.js for Supplier Orders Count
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartLabels = [@Html.Raw(chartLabels)];
+            const chartData = [@Html.Raw(chartData)];
+            if (window.Chart) {
+                const chartElem = document.getElementById('supplierChart');
+                if (chartElem) {
+                    if (window.supplierChartInstance) {
+                        window.supplierChartInstance.destroy();
+                    }
+                    const ctx = chartElem.getContext('2d');
+                    window.supplierChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [{
+                                label: 'Number of Orders',
+                                data: chartData,
+                                backgroundColor: 'rgba(67, 160, 71, 0.6)',
+                                borderColor: 'rgba(67, 160, 71, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { stepSize: 1 }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+}

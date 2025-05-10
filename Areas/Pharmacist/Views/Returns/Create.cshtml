@@ -1,0 +1,48 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Create Return";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded-4">
+        <div class="card-header bg-gradient-primary text-white d-flex align-items-center gap-2">
+            <i class="bi bi-arrow-repeat"></i>
+            <h2 class="mb-0">Create a Return</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="SelectReference" method="post" class="p-4">
+                <div class="form-group mb-3">
+                    <label for="ReturnType" class="form-label">Return Type</label>
+                    <select class="form-select" name="ReturnType" id="ReturnType" required>
+                        <option value="">-- Select Return Type --</option>
+                        <option value="SalesReturn">🧾 Sales Return</option>
+                        <option value="SupplierReturn">📦 Supplier Return</option>
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="ReferenceID" class="form-label">Invoice / Order ID</label>
+                    <input type="number" class="form-control" name="ReferenceID" placeholder="Enter related ID" required />
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success btn-lg px-4 py-2 rounded-pill shadow">
+                        <i class="bi bi-arrow-right-circle me-2"></i> Continue
+                    </button>
+                </div>
+            </form>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger mt-3">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <p>@error.ErrorMessage</p>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

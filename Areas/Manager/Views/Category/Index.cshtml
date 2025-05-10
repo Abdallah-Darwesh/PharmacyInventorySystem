@@ -1,0 +1,77 @@
+﻿@model IEnumerable<PharmacyInventorySystem.Models.Category>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Categories";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="section-header sales-reports-header">
+    <i class="bi bi-tags me-2"></i>
+    <span>Category List</span>
+</div>
+<div class="container mt-5">
+    <div class="d-flex justify-content-end align-items-center mb-4">
+        <a class="btn btn-success rounded-pill px-4 py-2 d-inline-flex align-items-center" asp-area="Manager" asp-controller="Category" asp-action="Create">
+            <i class="bi bi-plus-circle me-2"></i> Add New Category
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-hover table-bordered align-middle rounded">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Category Name</th>
+                    <th>Number of Products</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No categories found.</td>
+                    </tr>
+                }
+                else
+                {
+                    @* هنا نستخدم Select لجلب العنصر مع فهرسه *@
+                    @foreach (var pair in Model.Select((cat, index) => new { Cat = cat, Index = index }))
+                    {
+                        <tr>
+                            <td>@(pair.Index + 1)</td>
+                            <td>@pair.Cat.CategoryName</td>
+                            <td>@(pair.Cat.Products?.Count ?? 0)</td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a asp-area="Manager"
+                                       asp-controller="Category"
+                                       asp-action="Details"
+                                       asp-route-id="@pair.Cat.CategoryID"
+                                       class="btn btn-sm btn-outline-info">
+                                        Details
+                                    </a>
+                                    <a asp-area="Manager"
+                                       asp-controller="Category"
+                                       asp-action="Edit"
+                                       asp-route-id="@pair.Cat.CategoryID"
+                                       class="btn btn-sm btn-outline-warning">
+                                        Edit
+                                    </a>
+                                    <a asp-area="Manager"
+                                       asp-controller="Category"
+                                       asp-action="Delete"
+                                       asp-route-id="@pair.Cat.CategoryID"
+                                       class="btn btn-sm btn-outline-danger">
+                                        Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

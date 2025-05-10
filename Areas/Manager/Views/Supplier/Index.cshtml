@@ -1,0 +1,56 @@
+﻿@model IEnumerable<PharmacyInventorySystem.Models.Supplier>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Suppliers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="section-header sales-reports-header">
+    <i class="bi bi-truck me-2"></i>
+    <span>Suppliers</span>
+</div>
+<div class="container mt-5">
+    <div class="d-flex justify-content-end align-items-center mb-4">
+        <a asp-area="Manager" asp-controller="Supplier" asp-action="Create" class="btn btn-success rounded-pill px-4 py-2 d-inline-flex align-items-center shadow mt-2">
+            <i class="bi bi-plus-circle me-2"></i> Add New Supplier
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center shadow-sm">No suppliers found.</div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover table-bordered align-middle">
+                <thead class="table-dark">
+                    <tr class="text-center">
+                        <th>Supplier Name</th>
+                        <th>Contact Email</th>
+                        <th>Phone Number</th>
+                        <th style="width: 200px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var supplier in Model)
+                    {
+                        <tr>
+                            <td>@supplier.SupplierName</td>
+                            <td>@supplier.ContactEmail</td>
+                            <td>@supplier.PhoneNumber</td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a asp-area="Manager" asp-controller="Supplier" asp-action="Details" asp-route-id="@supplier.SupplierID" class="btn btn-sm btn-outline-info">Details</a>
+                                    <a asp-area="Manager" asp-controller="Supplier" asp-action="Edit" asp-route-id="@supplier.SupplierID" class="btn btn-sm btn-outline-warning">Edit</a>
+                                    <a asp-area="Manager" asp-controller="Supplier" asp-action="Delete" asp-route-id="@supplier.SupplierID" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

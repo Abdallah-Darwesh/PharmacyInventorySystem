@@ -1,0 +1,236 @@
+﻿@model PharmacyInventorySystem.ViewModels.SalesReportFilterViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Sales Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="section-header sales-reports-header">
+    <i class="bi bi-graph-up-arrow me-2"></i>
+    <span>Sales Report</span>
+</div>
+<div class="container mt-5">
+    <form method="get" class="card p-4 shadow-sm mb-4 rounded-4">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label>From Date</label>
+                <input asp-for="FromDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label>To Date</label>
+                <input asp-for="ToDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>Pharmacist</label>
+                <select asp-for="PharmacistId" asp-items="@(new SelectList(Model.Pharmacists, "Id", "FullName"))" class="form-select">
+                    <option value="">-- All Pharmacists --</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end mb-3">
+                <button type="submit" class="btn btn-primary w-100">🔍 Filter</button>
+            </div>
+        </div>
+    </form>
+
+    @if (Model.Sales != null && Model.Sales.Any())
+    {
+        <div class="mb-3 d-flex gap-2">
+            <button id="exportPdf" class="btn btn-danger">
+                📄 Export PDF
+            </button>
+            <button id="exportCsv" class="btn btn-success">
+                📥 Export CSV
+            </button>
+        </div>
+
+        <table id="salesTable" class="table table-bordered table-hover text-center shadow rounded-4 overflow-hidden">
+            <thead class="table-dark gradient-header">
+                <tr>
+                    <th>Invoice #</th>
+                    <th>Date</th>
+                    <th>Pharmacist</th>
+                    <th># Items</th>
+                    <th>Total Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var sale in Model.Sales)
+                {
+                    <tr>
+                        <td>@sale.SaleID</td>
+                        <td>@sale.SaleDate.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@sale.ApplicationUser?.FullName</td>
+                        <td>@sale.SalesDetails?.Count</td>
+                        <td>@sale.TotalPrice.ToString("0.00") EGP</td>
+                        <td>
+                            <a asp-area="Pharmacist" asp-controller="Sales" asp-action="Invoice" asp-route-id="@sale.SaleID" class="btn btn-sm btn-outline-primary">🧾 View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-light fw-bold">
+                <tr>
+                    <td colspan="4">Total Sales</td>
+                    <td colspan="2">@Model.Sales.Sum(s => s.TotalPrice).ToString("0.00") EGP</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Total Invoices</td>
+                    <td colspan="2">@Model.Sales.Count()</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Total Items Sold</td>
+                    <td colspan="2">@Model.Sales.Sum(s => s.SalesDetails.Sum(d => d.Quantity))</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="card p-3 shadow-sm rounded-4 mb-5">
+            <h4 class="text-primary text-center mb-3">📊 Sales Trend</h4>
+            <canvas id="salesChart" height="100"></canvas>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm rounded-4 h-100">
+                    <h5 class="text-center text-success">📊 Sales by Pharmacist</h5>
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm rounded-4 h-100">
+                    <h5 class="text-center text-warning">🥧 Top Selling Products</h5>
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center mt-4">
+            No sales records found for the selected filters.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        // Line Chart
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.SaleDates)),
+                datasets: [{
+                    label: 'Total Sales (EGP)',
+                    data: @Html.Raw(Json.Serialize(Model.TotalPrices)),
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => value + ' EGP'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Bar Chart
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.PharmacistNames)),
+                datasets: [{
+                    label: 'Total Sales (EGP)',
+                    data: @Html.Raw(Json.Serialize(Model.SalesByPharmacist)),
+                    backgroundColor: 'rgba(25, 135, 84, 0.7)',
+                    borderColor: 'rgba(25, 135, 84, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => value + ' EGP'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Pie Chart
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.TopProductNames)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.TopProductQuantities)),
+                    backgroundColor: ['#0d6efd', '#dc3545', '#198754', '#ffc107', '#6f42c1', '#20c997'],
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Export PDF
+        document.getElementById('exportPdf').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("Sales Report", 14, 16);
+            doc.autoTable({
+                html: '#salesTable',
+                startY: 20,
+                theme: 'grid'
+            });
+            doc.save('sales-report.pdf');
+        });
+
+        // Export CSV
+        document.getElementById('exportCsv').addEventListener('click', () => {
+            let csv = '';
+            const rows = document.querySelectorAll("#salesTable tr");
+            rows.forEach(row => {
+                const cols = row.querySelectorAll("td, th");
+                const rowData = [...cols].map(col => `"${col.innerText}"`).join(",");
+                csv += rowData + "\n";
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            saveAs(blob, 'sales-report.csv');
+        });
+
+        // DataTables
+        $(document).ready(function () {
+            $('#salesTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                lengthChange: false
+            });
+        });
+    </script>
+}

@@ -1,0 +1,72 @@
+﻿@model PharmacyInventorySystem.ViewModels.ManagerSupplierOrderDetailsViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Supplier Order Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-receipt-cutoff me-2"></i>Supplier Order Details</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Orders
+    </a>
+</div>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-dark text-white fw-bold">
+        General Info
+    </div>
+    <div class="card-body">
+        <p><strong>Supplier:</strong> @Model.SupplierName</p>
+        <p><strong>Pharmacist:</strong> @Model.PharmacistName</p>
+        <p><strong>Sign Date:</strong> @Model.SignOrderDate.ToString("yyyy-MM-dd")</p>
+        <p><strong>Total Amount:</strong> @Model.TotalAmount.ToString("C")</p>
+    </div>
+</div>
+
+<h4 class="mb-3">Products in this Order</h4>
+
+@if (Model.Products == null || Model.Products.Count == 0)
+{
+    <div class="alert alert-warning">
+        No products found for this order.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Qty</th>
+                    <th>B. Unit Price</th>
+                    <th>B. Package Price</th>
+                    <th>S. Unit Price</th>
+                    <th>S. Package Price</th>
+                    <th>Patch No</th>
+                    <th>Expiry</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Products.Count; i++)
+                {
+                    var p = Model.Products[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td>@p.ProductName</td>
+                        <td>@p.Quantity</td>
+                        <td>@p.BUnitPrice.ToString("C")</td>
+                        <td>@p.BPPrice.ToString("C")</td>
+                        <td>@p.SUnitPrice.ToString("C")</td>
+                        <td>@p.SPPrice.ToString("C")</td>
+                        <td>@p.PatchNom</td>
+                        <td>@p.ExDate.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

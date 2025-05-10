@@ -1,0 +1,13 @@
+@model (string FullName, string Role)
+<div class="user-info">
+    <div class="user-profile">
+        <div class="user-avatar">
+            <i class="bi bi-person-circle"></i>
+        </div>
+        <div class="user-details">
+            <h6 class="user-name"><span>@(Model.FullName ?? "[null]")</span></h6>
+            <span class="user-role">[@(Model.Role ?? "[null]")]</span>
+            <div style="font-size:0.8em;color:#888;">[DEBUG: FullName='@Model.FullName', Role='@Model.Role']</div>
+        </div>
+    </div>
+</div> 

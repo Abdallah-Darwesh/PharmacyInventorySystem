@@ -1,0 +1,73 @@
+@model PharmacyInventorySystem.ViewModels.PharmacistSupplierOrderDetailsViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Supplier Order PDF</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 14px; margin: 20px; }
+        h2 { text-align: center; margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: center; }
+        th { background: #e0e0e0; }
+        .summary-row { font-weight: bold; }
+        .debug { color: #c00; font-size: 12px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Supplier Order #@Model.SupplierOrderID</h2>
+    <p><strong>Supplier:</strong> @Model.SupplierName</p>
+    <p><strong>Pharmacist:</strong> @Model.PharmacistName</p>
+    <p><strong>Date:</strong> @Model.SignOrderDate.ToString("yyyy-MM-dd")</p>
+    <p><strong>Total Amount:</strong> @Model.TotalAmount.ToString("0.00") EGP</p>
+    <hr />
+    <h4>Products in this Order</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Expiry</th>
+                <th>Quantity</th>
+                <th>B. Unit Price</th>
+                <th>B. Package Price</th>
+                <th>S. Unit Price</th>
+                <th>S. Package Price</th>
+                <th>Patch No</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Products != null && Model.Products.Count > 0)
+            {
+                for (int i = 0; i < Model.Products.Count; i++)
+                {
+                    var p = Model.Products[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td>@(p.ProductName ?? "-")</td>
+                        <td>@(p.CategoryName ?? "-")</td>
+                        <td>@(p.ExDate != DateTime.MinValue ? p.ExDate.ToString("yyyy-MM-dd") : "-")</td>
+                        <td>@p.Quantity</td>
+                        <td>@p.BUnitPrice.ToString("0.00") EGP</td>
+                        <td>@p.BPPrice.ToString("0.00") EGP</td>
+                        <td>@p.SUnitPrice.ToString("0.00") EGP</td>
+                        <td>@p.SPPrice.ToString("0.00") EGP</td>
+                        <td>@(p.PatchNom ?? "-")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="10">No products found for this order.</td></tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html> 

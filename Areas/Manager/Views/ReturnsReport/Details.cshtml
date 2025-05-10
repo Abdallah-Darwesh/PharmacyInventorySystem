@@ -1,0 +1,46 @@
+﻿@model PharmacyInventorySystem.ViewModels.ReturnReportViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Return Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Return Details - @Model.ReturnID</h4>
+        </div>
+        <div class="card-body">
+            <h5>Date: @Model.ReturnDate.ToShortDateString()</h5>
+            <h5>Return Type: @Model.ReturnType</h5>
+            <h5>Total Cost: @Model.TotalReturnCost.ToString("C")</h5>
+
+            <table class="table table-bordered mt-4">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Unit Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Details)
+                    {
+                        <tr>
+                            <td>@item.ProductName</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.UnitCost.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="text-end">
+                <a asp-action="Index" class="btn btn-outline-dark">
+                    <i class="bi bi-arrow-left"></i> Back to Report
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

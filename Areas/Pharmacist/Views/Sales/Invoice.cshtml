@@ -1,0 +1,65 @@
+﻿@model PharmacyInventorySystem.Models.Sale
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var salesList = Model.SalesDetails.ToList();
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg rounded-4">
+        <div class="card-header bg-primary text-white text-center py-4">
+            <h2 class="mb-0">Pharmacy Sale Invoice</h2>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <strong>Date:</strong> @Model.SaleDate.ToString("yyyy-MM-dd hh:mm tt")
+                </div>
+                <div class="col-md-4 text-center">
+                    <strong>Pharmacist:</strong> @ViewBag.PharmacistFullName
+                </div>
+                <div class="col-md-4 text-end">
+                    <strong>Invoice No:</strong> @Model.SaleID
+                </div>
+            </div>
+
+            <table class="table table-bordered text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Product</th>
+                        <th>Sale Type</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>SubTotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < salesList.Count; i++)
+                    {
+                        var item = salesList[i];
+                        <tr>
+                            <td>@(i + 1)</td>
+                            <td>@item.Product?.ProductName</td>
+                            <td>@item.SaleType</td>
+                            <td>@item.Quantity</td>
+                            <td>@(item.UnitPrice.ToString("0.00")) EGP</td>
+                            <td>@((item.UnitPrice * item.Quantity).ToString("0.00")) EGP</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-light fw-bold">
+                        <td colspan="5" class="text-end">Total:</td>
+                        <td>@Model.TotalPrice.ToString("0.00") EGP</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="text-center mt-4">
+                <button class="btn btn-outline-primary px-5 py-2" onclick="window.print()">
+                    🖨️ Print Invoice
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

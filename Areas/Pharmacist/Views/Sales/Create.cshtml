@@ -1,0 +1,50 @@
+﻿@model PharmacyInventorySystem.ViewModels.CreateSaleViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Create Sale";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded-4">
+        <div class="card-header bg-gradient-primary text-white d-flex align-items-center gap-2">
+            <i class="bi bi-receipt"></i>
+            <h2 class="mb-0">New Sale Invoice</h2>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-8 mx-auto">
+                    <input type="text" class="form-control" id="searchInput" placeholder="🔍 Search product by name...">
+                    <div id="searchResults" class="list-group mt-2"></div>
+                </div>
+            </div>
+            <form asp-action="Confirm" method="post" id="saleForm" onsubmit="return validateSale();">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center align-middle rounded-4 overflow-hidden">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Sale Type</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total</th>
+                                <th>🗑️</th>
+                            </tr>
+                        </thead>
+                        <tbody id="saleItemsTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="text-end mb-3">
+                    <h5 class="fw-bold">Grand Total: <span id="grandTotal">0.00</span> EGP</h5>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success btn-lg px-4 py-2 rounded-pill shadow">✅ Confirm Sale & Print Invoice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Sales.js"></script>
+}

@@ -1,0 +1,52 @@
+﻿@model PharmacyInventorySystem.Models.Category
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Category Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Category: @Model.CategoryName</h4>
+            <a asp-area="Manager" asp-controller="Category" asp-action="Index" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+        <div class="card-body">
+            @if (!Model.Products.Any())
+            {
+                <p class="text-muted">No products in this category.</p>
+            }
+            else
+            {
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Sell Unit Price</th>
+                            <th>Quantity</th>
+                            <th>Expiry</th>
+                            <th>Batch</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Products)
+                        {
+                            <tr>
+                                <td>@p.ProductID</td>
+                                <td>@p.ProductName</td>
+                                <td>@String.Format("{0:C}", p.SUnitPrice)</td>
+                                <td>@p.Quantity</td>
+                                <td>@p.ExDate.ToShortDateString()</td>
+                                <td>@p.PatchNom</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>

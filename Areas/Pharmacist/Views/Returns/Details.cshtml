@@ -1,0 +1,57 @@
+﻿@model PharmacyInventorySystem.Models.Return
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Return Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string returnTypeLabel = Model.ReturnType == "SalesReturn" ? "Sales Return" : "Supplier Return";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded-4">
+        <div class="card-header bg-gradient-primary text-white d-flex align-items-center gap-2">
+            <i class="bi bi-file-earmark-text"></i>
+            <h2 class="mb-0">@returnTypeLabel Details</h2>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <p><strong>Return Date:</strong> @Model.ReturnDate.ToString("yyyy-MM-dd HH:mm")</p>
+                @if (Model.ReturnType == "SalesReturn")
+                {
+                    <p><strong>Sale ID:</strong> @Model.SaleID</p>
+                }
+                else if (Model.ReturnType == "SupplierReturn")
+                {
+                    <p><strong>Supplier Order ID:</strong> @Model.SupplierOrderID</p>
+                }
+                <p><strong>Total Cost:</strong> @Model.TotalReturnCost.ToString("0.00") EGP</p>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle rounded-4 overflow-hidden">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Product</th>
+                            <th>Returned Qty</th>
+                            <th>Unit Cost</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ReturnDetails)
+                        {
+                            <tr>
+                                <td>@item.Product.ProductName</td>
+                                <td>@item.ReturnQuantity</td>
+                                <td>@item.ReturnUnitCost.ToString("0.00") EGP</td>
+                                <td>@(item.ReturnQuantity * item.ReturnUnitCost).ToString("0.00") EGP</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center mt-4">
+                <a asp-action="Create" class="btn btn-secondary btn-lg px-4 py-2 rounded-pill">⬅ Back to Create</a>
+            </div>
+        </div>
+    </div>
+</div>

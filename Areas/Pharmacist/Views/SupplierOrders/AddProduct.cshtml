@@ -1,0 +1,108 @@
+﻿@model PharmacyInventorySystem.ViewModels.AddProductToSupplierOrderViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Add Product to Supplier Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded-4 mb-5">
+        <div class="card-header bg-gradient-primary text-white d-flex align-items-center gap-2">
+            <i class="bi bi-plus-circle"></i>
+            <h2 class="mb-0">Add Product to Supplier Order</h2>
+        </div>
+        <div class="card-body bg-light">
+            <form asp-action="AddProduct" method="post" class="needs-validation">
+                @Html.HiddenFor(model => model.SupplierOrderID)
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label asp-for="ProductName" class="form-label fw-semibold"></label>
+                        <input asp-for="ProductName" class="form-control" placeholder="e.g. Paracetamol" />
+                        <span asp-validation-for="ProductName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="CategoryID" class="form-label fw-semibold"></label>
+                        <select asp-for="CategoryID" asp-items="Model.Categories" class="form-select">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                        <span asp-validation-for="CategoryID" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="SUnitPrice" class="form-label fw-semibold"></label>
+                        <input asp-for="SUnitPrice" class="form-control" />
+                        <span asp-validation-for="SUnitPrice" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="SPPrice" class="form-label fw-semibold"></label>
+                        <input asp-for="SPPrice" class="form-control" />
+                        <span asp-validation-for="SPPrice" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Quantity" class="form-label fw-semibold"></label>
+                        <input asp-for="Quantity" class="form-control" />
+                        <span asp-validation-for="Quantity" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="BUnitPrice" class="form-label fw-semibold"></label>
+                        <input asp-for="BUnitPrice" class="form-control" />
+                        <span asp-validation-for="BUnitPrice" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="BPPrice" class="form-label fw-semibold"></label>
+                        <input asp-for="BPPrice" class="form-control" />
+                        <span asp-validation-for="BPPrice" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="ExDate" class="form-label fw-semibold"></label>
+                        <input asp-for="ExDate" type="date" class="form-control" />
+                        <span asp-validation-for="ExDate" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="PatchNom" class="form-label fw-semibold"></label>
+                        <input asp-for="PatchNom" class="form-control" />
+                        <span asp-validation-for="PatchNom" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="submit" name="actionType" value="add" class="btn btn-success btn-lg px-4 py-2 rounded-pill shadow">
+                        Confirm & Add Another
+                    </button>
+                </div>
+            </form>
+            <h4 class="mb-3 mt-5">Products in this Order</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle rounded-4 overflow-hidden">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Expiry</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ViewBag.ExistingProducts as List<PharmacyInventorySystem.Models.SupplierOrderDetail>)
+                        {
+                            <tr>
+                                <td>@item.Product?.ProductName</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Product?.ExDate.ToShortDateString()</td>
+                                <td>@item.Product?.Category?.CategoryName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <a asp-action="Summary" asp-route-id="@Model.SupplierOrderID" class="btn btn-primary btn-lg px-4 py-2 rounded-pill mt-3">
+                Finish Order
+            </a>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,178 @@
+﻿@model IEnumerable<PharmacyInventorySystem.ViewModels.ReturnReportViewModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+@{
+    ViewData["Title"] = "Returns Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // إعداد خيارات الـ JSON لكي يحوّل الـ enum إلى نص
+    var jsonOptions = new JsonSerializerOptions();
+    jsonOptions.Converters.Add(new JsonStringEnumConverter());
+}
+
+<!-- Styles for DataTables -->
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet" />
+
+<div class="container mt-5">
+    <div class="card shadow rounded">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Returns Report</h4>
+            <a asp-action="Index" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-clockwise"></i> Reset Filters
+            </a>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="fromDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="toDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Return Type</label>
+                    <select name="returnType" class="form-select">
+                        <option value="">-- All --</option>
+                        <option value="SalesReturn">Sales Return</option>
+                        <option value="SupplierReturn">Supplier Return</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-filter-circle"></i> Filter
+                    </button>
+                </div>
+            </form>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">No return records found for selected criteria.</div>
+            }
+            else
+            {
+                <div class="text-end mb-3">
+                    <a asp-action="Print"
+                       asp-route-fromDate="@Context.Request.Query["fromDate"]"
+                       asp-route-toDate="@Context.Request.Query["toDate"]"
+                       asp-route-returnType="@Context.Request.Query["returnType"]"
+                       class="btn btn-outline-dark">
+                        <i class="bi bi-printer"></i> Print PDF
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="returnsTable" class="table table-striped table-bordered align-middle text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Products</th>
+                                <th>Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int count = 1;
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@item.ReturnDate.ToShortDateString()</td>
+                                        <td>@item.ReturnType</td>
+                                        <td>
+                                            <a asp-action="Details" asp-route-id="@item.ReturnID" class="btn btn-link">
+                                                View Details
+                                            </a>
+                                        </td>
+                                        <td>@item.TotalReturnCost.ToString("C")</td>
+                                    </tr>
+                                    count++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-5">
+                    <h5>Return Type Summary</h5>
+                    <canvas id="returnChart" height="100"></canvas>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js & DataTables Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // تهيئة DataTable
+        $('#returnsTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'print'
+            ],
+            pageLength: 10,
+            order: [[1, 'desc']]
+        });
+
+        // جلب الداتا من السيرفر كـ JSON نصي للـ enum
+        const returnData = @Html.Raw(
+            JsonSerializer.Serialize(
+                Model.ToList(),
+                jsonOptions
+            )
+        );
+        console.log('returnData =', returnData);
+
+        // الآن الفلترة تعمل بشكل صحيح لأن ReturnType نص
+        const salesCount    = returnData.filter(x => x.ReturnType === "SalesReturn").length;
+        const supplierCount = returnData.filter(x => x.ReturnType === "SupplierReturn").length;
+
+        // رسم الدونات
+        const ctx = document.getElementById('returnChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sales Returns', 'Supplier Returns'],
+                datasets: [{
+                    label: 'Return Type',
+                    data: [salesCount, supplierCount],
+                    backgroundColor: ['#0dcaf0', '#ffc107'],
+                    borderColor: ['#0dcaf0', '#ffc107'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return `${context.label}: ${context.raw} returns`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
